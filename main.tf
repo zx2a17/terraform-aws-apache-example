@@ -69,8 +69,18 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
+
+data "aws_subnets" "subnet_ids" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
+  //vpc_id = data.aws_vpc.main.id
+}
+
 resource "aws_instance" "my_server" {
   ami                    = data.aws_ami.ubuntu.id
+  subnet_id = data.aws_subnets.subnet_ids.ids[0]
   instance_type          = var.instance_type
   key_name               = aws_key_pair.deployer.key_name
   vpc_security_group_ids = [aws_security_group.sg_terra_assoc.id]
